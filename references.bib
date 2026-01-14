@@ -1,0 +1,399 @@
+@article{tetgen,
+  author = {Si, Hang},
+  title = {TetGen, a Delaunay-Based Quality Tetrahedral Mesh Generator},
+  year = {2015},
+  issue_date = {January 2015},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {41},
+  number = {2},
+  issn = {0098-3500},
+  url = {https://doi.org/10.1145/2629697},
+  doi = {10.1145/2629697},
+  abstract = {TetGen is a C++ program for generating good quality tetrahedral
+              meshes aimed to support numerical methods and scientific computing.
+              The problem of quality tetrahedral mesh generation is challenged by
+              many theoretical and practical issues. TetGen uses Delaunay-based
+              algorithms which have theoretical guarantee of correctness. It can
+              robustly handle arbitrary complex 3D geometries and is fast in
+              practice. The source code of TetGen is freely available.This
+              article presents the essential algorithms and techniques used to
+              develop TetGen. The intended audience are researchers or developers
+              in mesh generation or other related areas. It describes the key
+              software components of TetGen, including an efficient tetrahedral
+              mesh data structure, a set of enhanced local mesh operations
+              (combination of flips and edge removal), and filtered exact
+              geometric predicates. The essential algorithms include incremental
+              Delaunay algorithms for inserting vertices, constrained Delaunay
+              algorithms for inserting constraints (edges and triangles), a new
+              edge recovery algorithm for recovering constraints, and a new
+              constrained Delaunay refinement algorithm for adaptive quality
+              tetrahedral mesh generation. Experimental examples as well as
+              comparisons with other softwares are presented.},
+  journal = {ACM Trans. Math. Softw.},
+  month = {feb},
+  articleno = {11},
+  numpages = {36},
+  keywords = {boundary recovery, mesh refinement, constrained Delaunay, edge
+              removal, flips, mesh improvement, mesh quality, Delaunay, Steiner
+              points, Tetrahedral mesh generation},
+}
+
+@article{tetwild,
+  author = {Hu, Yixin and Zhou, Qingnan and Gao, Xifeng and Jacobson, Alec and
+            Zorin, Denis and Panozzo, Daniele},
+  title = {Tetrahedral Meshing in the Wild},
+  journal = {ACM Trans. Graph.},
+  issue_date = {August 2018},
+  volume = {37},
+  number = {4},
+  month = jul,
+  year = {2018},
+  issn = {0730-0301},
+  pages = {60:1--60:14},
+  articleno = {60},
+  numpages = {14},
+  url = {http://doi.acm.org/10.1145/3197517.3201353},
+  doi = {10.1145/3197517.3201353},
+  acmid = {3201353},
+  publisher = {ACM},
+  address = {New York, NY, USA},
+  keywords = {mesh generation, robust geometry processing, tetrahedral meshing},
+} 
+
+@article{gpolylla,
+  title={GPU Parallel algorithm for the generation of polygonal meshes based on terminal-edge regions},
+  author={Sergio Salinas and J. Ojeda and Nancy Hitschfeld-Kahler and Alejandro Ortiz-Bernardin},
+  journal={ArXiv},
+  year={2022},
+  volume={abs/2204.05438},
+  url={https://api.semanticscholar.org/CorpusID:248118973}
+}
+
+@article{polylla,
+  abstract = {This paper presents an algorithm to generate a new kind of
+              polygonal mesh obtained from triangulations. Each polygon is built
+              from a terminal-edge region surrounded by edges that are not the
+              longest-edge of any of the two triangles that share them. The
+              algorithm is termed Polylla and is divided into three phases. The
+              first phase consists of labeling each edge of the input
+              triangulation according to its size; the second phase builds
+              polygons (simple or not) from terminal-edges regions using the
+              label system; and the third phase transforms each non simple
+              polygon into simple ones. The final mesh contains polygons with
+              convex and non convex shape. Since Voronoi-based meshes are
+              currently the most used polygonal meshes, we compare some geometric
+              properties of our meshes against constrained Voronoi meshes.
+              Several experiments were run to compare the shape and size of
+              polygons, the number of final mesh points and polygons. For the
+              same input, Polylla meshes contain less polygons than Voronoi
+              meshes and the algorithm is simpler and faster than the algorithm
+              to generate constrained Voronoi meshes. Finally, we have validated
+              Polylla meshes by solving the Laplace equation on an L-shaped
+              domain using the virtual element method (VEM). We show that the
+              numerical performance of the VEM using Polylla meshes and Voronoi
+              meshes is similar.},
+  author = {Salinas-Fern{\'a}ndez, Sergio and Hitschfeld-Kahler, Nancy and
+            Ortiz-Bernardin, Alejandro and Si, Hang},
+  date = {2022/10/01},
+  date-added = {2023-12-06 22:24:56 -0300},
+  date-modified = {2023-12-06 22:24:56 -0300},
+  doi = {10.1007/s00366-022-01643-4},
+  id = {Salinas-Fern{\'a}ndez2022},
+  isbn = {1435-5663},
+  journal = {Engineering with Computers},
+  number = {5},
+  pages = {4545--4567},
+  title = {POLYLLA: polygonal meshing algorithm based on terminal-edge regions},
+  url = {https://doi.org/10.1007/s00366-022-01643-4},
+  volume = {38},
+  year = {2022},
+  bdsk-url-1 = {https://doi.org/10.1007/s00366-022-01643-4},
+}
+
+@article{survey,
+  author = {Navarro, Cristobal and Hitschfeld, Nancy and Mateu, Luis},
+  year = {2013},
+  month = {09},
+  pages = {285-329},
+  title = {A Survey on Parallel Computing and its Applications in Data-Parallel
+           Problems Using GPU Architectures},
+  volume = {15},
+  journal = {Communications in Computational Physics},
+  doi = {10.4208/cicp.110113.010813a},
+}
+
+@misc{polgit,
+  author = {Alvarez, Magdalena},
+  title = {3{D} {P}olylla},
+  url = {https://github.com/Magdalena-Alvarez/3D-Polylla},
+  year = {2023},
+  note = {[Accessed 07-12-2023]},
+}
+
+@thesis{pol3d,
+  author = {Alvarez, Magdalena},
+  title = {Generación de mallas de poliedros: optimización y evaluación},
+  school = {Universidad de Chile},
+  year = {2024},
+  type = {Tesis de Magíster},
+  note = {Hola}
+}
+
+@thesis{polth,
+  author = {Salinas, Sergio},
+  title = {Polygonal/Polyhedral mesh generation from Delaunay tessellations},
+  school = {Universidad de Chile},
+  year = {2024},
+}
+
+@book{cgal,
+  title = "{CGAL} User and Reference Manual",
+  author = "{The CGAL Project}",
+  publisher = "{CGAL Editorial Board}",
+  edition = "{5.6}",
+  year = 2023,
+  url = "https://doc.cgal.org/5.6/Manual/packages.html",
+}
+
+@incollection{cgal:mesh,
+  author = {Pierre Alliez and Cl{\'e}ment Jamin and Laurent Rineau and St{\'e}
+            phane Tayeb and Jane Tournois and Mariette Yvinec},
+  title = {{3D} Mesh Generation},
+  publisher = {{CGAL Editorial Board}},
+  edition = {{5.6}},
+  booktitle = {{CGAL} User and Reference Manual},
+  url = {https://doc.cgal.org/5.6/Manual/packages.html#PkgMesh3},
+  year = 2023,
+}
+
+@misc{polyscope,
+  title = {Polyscope},
+  author = {Nicholas Sharp and others},
+  url = {https://www.polyscope.run},
+  year = {2019},
+}
+
+@INPROCEEDINGS{delaunay,
+  author={Chen, Zhenghai and Tan, Tiow-Seng},
+  booktitle={2019 28th International Conference on Parallel Architectures and Compilation Techniques (PACT)}, 
+  title={Computing Three-Dimensional Constrained Delaunay Refinement Using the GPU}, 
+  year={2019},
+  volume={},
+  number={},
+  pages={409-420},
+  keywords={Graphics processing units;Steiner trees;Instruction sets;Multicore processing;Software algorithms;Data structures;GPGPU;Computational Geometry;Mesh Refinement;Finite Element Analysis},
+  doi={10.1109/PACT.2019.00039}
+}
+
+@article{rxmesh,
+  author = {Mahmoud, Ahmed H. and Porumbescu, Serban D. and Owens, John D.},
+  title = {RXMesh: a GPU mesh data structure},
+  year = {2021},
+  issue_date = {August 2021},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {40},
+  number = {4},
+  issn = {0730-0301},
+  url = {https://doi.org/10.1145/3450626.3459748},
+  doi = {10.1145/3450626.3459748},
+  abstract = {We propose a new static high-performance mesh data structure for triangle surface meshes on the GPU. Our data structure is carefully designed for parallel execution while capturing mesh locality and confining data access, as much as possible, within the GPU's fast "shared memory." We achieve this by subdividing the mesh into patches and representing these patches compactly using a matrix-based representation. Our patching technique is decorated with ribbons, thin mesh strips around patches that eliminate the need to communicate between different computation thread blocks, resulting in consistent high throughput. We call our data structure RXMesh: Ribbon-matriX Mesh. We hide the complexity of our data structure behind a flexible but powerful programming model that helps deliver high performance by inducing load balance even in highly irregular input meshes. We show the efficacy of our programming model on common geometry processing applications---mesh smoothing and filtering, geodesic distance, and vertex normal computation. For evaluation, we benchmark our data structure against well-optimized GPU and (single and multi-core) CPU data structures and show significant speedups.},
+  journal = {ACM Trans. Graph.},
+  month = {jul},
+  articleno = {104},
+  numpages = {16},
+  keywords = {GPU, data structure, mesh, parallel}
+}
+
+@article{adaptmesh,
+  title = {A GPU-accelerated adaptive mesh refinement for immersed boundary methods},
+  journal = {Computers & Fluids},
+  volume = {118},
+  pages = {131-147},
+  year = {2015},
+  issn = {0045-7930},
+  doi = {https://doi.org/10.1016/j.compfluid.2015.06.011},
+  url = {https://www.sciencedirect.com/science/article/pii/S0045793015001942},
+  author = {Hua Ji and Fue-Sang Lien and Fan Zhang},
+  keywords = {AMR, GPU, Immersed boundary method},
+  abstract = {A new patch-based adaptive mesh refinement (AMR) code is developed. The fully threaded tree (FTT) data structure (Khokhlov, 1998) originally developed for cell-based AMR is extended to organize the patch-based adaptive meshes. We demonstrate the accuracy of the AMR code by performing the simulations of the two and three-dimensional Sedov blast wave problems. We measure the performance of the code by solving the same problems in different grid resolutions on a single CPU, where detailed timing analyses provide comparison between the current AMR code and a conventional oct-tree-based AMR code (FLASH 4.0.1) (Fryxell et al., 2000). For the two-dimensional cases, maximum speed-up ratio of 58.23 is obtained versus FLASH 4.0.1 with 5122 effective grid resolution. For the three-dimensional cases, maximum speed-up ratios of 32.16 is achieved over FLASH 4.0.1 with 1283 effective grid resolution. We present the implementation and performance of a patch-based AMR algorithm with the immersed boundary method (IBM) on Graphic Processing Units (GPU). We also applied several optimizations in GPU computation, including the asynchronous memory copy, the concurrent execution between CPU and GPU and hybrid MPI/OpenMP/GPU parallelization. Performance benchmarks are conducted on the GPU cluster on SHARCNET (https://www.sharcnet.ca/) using 1–8 Tesla M2070 GPUs. Maximum speed-up factors of 22.3 and 20.5 are demonstrated using one GPU and 8 GPUs with 20483 effective resolution, respectively.}
+}
+
+@article{vorocrust,
+  author = {Abdelkader, Ahmed and Bajaj, Chandrajit L. and Ebeida, Mohamed S. and Mahmoud, Ahmed H. and Mitchell, Scott A. and Owens, John D. and Rushdi, Ahmad A.},
+  title = {VoroCrust: Voronoi Meshing Without Clipping},
+  year = {2020},
+  issue_date = {June 2020},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {39},
+  number = {3},
+  issn = {0730-0301},
+  url = {https://doi.org/10.1145/3337680},
+  doi = {10.1145/3337680},
+  abstract = {Polyhedral meshes are increasingly becoming an attractive option with particular advantages over traditional meshes for certain applications.What has been missing is a robust polyhedral meshing algorithm that can handle broad classes of domains exhibiting arbitrarily curved boundaries and sharp features. In addition, the power of primal-dual mesh pairs, exemplified by Voronoi-Delaunay meshes, has been recognized as an important ingredient in numerous formulations. The VoroCrust algorithm is the first provably correct algorithm for conforming polyhedral Voronoi meshing for non-convex and non-manifold domains with guarantees on the quality of both surface and volume elements. A robust refinement process estimates a suitable sizing field that enables the careful placement of Voronoi seeds across the surface, circumventing the need for clipping and avoiding its many drawbacks. The algorithm has the flexibility of filling the interior by either structured or random samples while preserving all sharp features in the output mesh. We demonstrate the capabilities of the algorithm on a variety of models and compare against state-of-the-art polyhedral meshing methods based on clipped Voronoi cells establishing the clear advantage of VoroCrust output.},
+  journal = {ACM Trans. Graph.},
+  month = {may},
+  articleno = {23},
+  numpages = {16},
+  keywords = {Poisson-disk sampling, Voronoi, meshing, refinement, sharp features, slivers, union of balls}
+}
+
+@article{tetgen:bowyer,
+    author = {Bowyer, A.},
+    title = "{Computing Dirichlet tessellations*}",
+    journal = {The Computer Journal},
+    volume = {24},
+    number = {2},
+    pages = {162-166},
+    year = {1981},
+    month = {01},
+    abstract = "{An efficient algorithm is proposed for computing the Dirichlet tessellation and Delaunay triangulation in a k dimensional Euclidean space (k≥2). The algorithm is designed in a way that should allow it to be extended to some of the simpler non-Euclidean metric spaces as well. The algorithm has been implemented in ISO FORTRAN by the author and execution time and stereoscopic pictures of the tessellation and triangulation are presented at the end of this paper.}",
+    issn = {0010-4620},
+    doi = {10.1093/comjnl/24.2.162},
+    url = {https://doi.org/10.1093/comjnl/24.2.162},
+    eprint = {https://academic.oup.com/comjnl/article-pdf/24/2/162/967239/240162.pdf},
+}
+
+@article{tetgen:watson,
+    author = {Watson, D. F.},
+    title = "{Computing the n-dimensional Delaunay tessellation with application to Voronoi polytopes*}",
+    journal = {The Computer Journal},
+    volume = {24},
+    number = {2},
+    pages = {167-172},
+    year = {1981},
+    month = {01},
+    abstract = "{The Delaunay tessellation in n-dimensional space is a space-filling aggregate of n-simplices. These n-simplices are the dual forms of the vertices in the commonly used Voronoi tessellation. Several efforts have been made to simulate the 2-dimensional Voronoi tessellation on the computer. Additional problems occur for the 3 and higher dimensional implementations but some of these can be avoided by alternatively computing the dual Delaunay tessellation. An algorithm that finds the topological relationships in these tessellations is given.}",
+    issn = {0010-4620},
+    doi = {10.1093/comjnl/24.2.167},
+    url = {https://doi.org/10.1093/comjnl/24.2.167},
+    eprint = {https://academic.oup.com/comjnl/article-pdf/24/2/167/967258/240167.pdf},
+}
+
+@inproceedings{tetgen:flip,
+  author = {Edelsbrunner, Herbert and Shah, Nimish R.},
+  title = {Triangulating topological spaces},
+  year = {1994},
+  isbn = {0897916484},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/177424.178010},
+  doi = {10.1145/177424.178010},
+  abstract = {Given a subspace 𝒳 ⊆ Rd and a finite set S⊆Rd, we introduce the Delaunay simplicial complex, D𝒳, restricted by 𝒳. Its simplices are spanned by subsets T⊆S for which the common intersection of Voronoi cells meets 𝒳 in a non-empty set. By the nerve theorem,⋃D𝒳 and 𝒳 are homotopy equivalent if all such sets are contractible. This paper shows that ⋃D𝒳 and 𝒳 are homeomorphic if the sets can be further subdivided in a certain way so they form a regular CW complex.},
+  booktitle = {Proceedings of the Tenth Annual Symposium on Computational Geometry},
+  pages = {285–292},
+  numpages = {8},
+  location = {Stony Brook, New York, USA},
+  series = {SCG '94}
+}
+
+@article{boisson,
+  title = {Provably good sampling and meshing of surfaces},
+  journal = {Graphical Models},
+  volume = {67},
+  number = {5},
+  pages = {405-451},
+  year = {2005},
+  note = {Solid Modeling and Applications},
+  issn = {1524-0703},
+  doi = {https://doi.org/10.1016/j.gmod.2005.01.004},
+  url = {https://www.sciencedirect.com/science/article/pii/S1524070305000056},
+  author = {Jean-Daniel Boissonnat and Steve Oudot},
+  keywords = {Surface mesh generation, -sampling, Surface approximation, Restricted Delaunay triangulation, Mesh refinement},
+  abstract = {The notion of ε-sample, introduced by Amenta and Bern, has proven to be a key concept in the theory of sampled surfaces. Of particular interest is the fact that, if E is an ε-sample of a C2-continuous surface S for a sufficiently small ε, then the Delaunay triangulation of E restricted to S is a good approximation of S, both in a topological and in a geometric sense. Hence, if one can construct an ε-sample, one also gets a good approximation of the surface. Moreover, correct reconstruction is ensured by various algorithms. In this paper, we introduce the notion of loose ε-sample. We show that the set of loose ε-samples contains and is asymptotically identical to the set of ε-samples. The main advantage of loose ε-samples over ε-samples is that they are easier to check and to construct. We also present a simple algorithm that constructs provably good surface samples and meshes. Given a C2-continuous surface S without boundary, the algorithm generates a sparse ε-sample E and at the same time a triangulated surface Del|S(E). The triangulated surface has the same topological type as S, is close to S for the Hausdorff distance and can provide good approximations of normals, areas and curvatures. A notable feature of the algorithm is that the surface needs only to be known through an oracle that, given a line segment, detects whether the segment intersects the surface and, in the affirmative, returns the intersection points. This makes the algorithm useful in a wide variety of contexts and for a large class of surfaces.}
+}
+  
+@inproceedings{cgal:chew,
+  author = {Chew, L. Paul},
+  title = {Guaranteed-quality mesh generation for curved surfaces},
+  year = {1993},
+  isbn = {0897915828},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/160985.161150},
+  doi = {10.1145/160985.161150},
+  abstract = {For several commonly-used solution techniques for partial differential equations, the first step is to divide the problem region into simply-shaped elements, creating a mesh. We present a technique for creating high-quality triangular meshes for regions on curved surfaces. This technique is an extension of previous methods we developed for regions in the plane. For both flat and curved surfaces, the resulting meshes are guaranteed to exhibit the following properties: (1) internal and external boundaries are respected, (2) element shapes are guaranteed—all elements are triangles with angles between 30 and 120 degrees (with the exception of badly shaped elements that may be required by the specified boundary), and (3) element density can be controlled, producing small elements in “interesting” areas and large elements elsewhere. An additional contribution of this paper is the development of a practical generalization of Delaunay triangulation to curved surfaces.},
+  booktitle = {Proceedings of the Ninth Annual Symposium on Computational Geometry},
+  pages = {274–280},
+  numpages = {7},
+  location = {San Diego, California, USA},
+  series = {SCG '93}
+}
+@article{cgal:ruppert,
+  title = {A Delaunay Refinement Algorithm for Quality 2-Dimensional Mesh Generation},
+  journal = {Journal of Algorithms},
+  volume = {18},
+  number = {3},
+  pages = {548-585},
+  year = {1995},
+  issn = {0196-6774},
+  doi = {https://doi.org/10.1006/jagm.1995.1021},
+  url = {https://www.sciencedirect.com/science/article/pii/S0196677485710218},
+  author = {J. Ruppert},
+  abstract = {We present a simple new algorithm for triangulating polygons and planar straightline graphs, It provides "shape" and "size" guarantees: •All triangles have a bounded aspect ratio.•The number of triangles is within a constant factor of optimal. Such "quality" triangulations are desirable as meshes for the finite element method, in which the running time generally increases with the number of triangles, and where the convergence and stability may be hurt by very skinny triangles. The technique we use-successive refinement of a Delaunay triangulation-extends a mesh generation technique of Chew by allowing triangles of varying sizes. Compared with previous quadtree-based algorithms for quality mesh generation, the Delaunay refinement approach is much simpler and generally produces meshes with fewer triangles. We also discuss an implementation of the algorithm and evaluate its performance on a variety of inputs.}
+}
+@inproceedings{gcal:shewchuk,
+  title={Tetrahedral mesh generation by Delaunay refinement},
+  author={Shewchuk, Jonathan Richard},
+  booktitle={Proceedings of the fourteenth annual symposium on Computational geometry},
+  pages={86--95},
+  year={1998}
+}
+
+@article{cpuparallel,
+  author = {Kohout, Josef and Kolingerova, Ivana and Zara, Jiri},
+  year = {2005},
+  month = {05},
+  pages = {491-522},
+  title = {Parallel Delaunay triangulation in E2 and E3 for computers with shared memory},
+  volume = {31},
+  journal = {Parallel Computing},
+  doi = {10.1016/j.parco.2005.02.010}
+}
+
+@inproceedings{paragon,
+  author = {Lee, Fenglien},
+  title = {Constructing the constrained Delaunay triangulation on the Intel paragon},
+  year = {1997},
+  isbn = {0897918509},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/331697.332333},
+  doi = {10.1145/331697.332333},
+  booktitle = {Proceedings of the 1997 ACM Symposium on Applied Computing},
+  pages = {464–467},
+  numpages = {4},
+  keywords = {computational geometry, data structures, mesh generation, parallel algorithm, robotics},
+  location = {San Jose, California, USA},
+  series = {SAC '97}
+}
+@article{rivara,
+  title={New longest-edge algorithms for the refinement and/or improvement of unstructured triangulations},
+  author={Rivara, Mar{\'\i}a-Cecilia},
+  journal={International journal for numerical methods in Engineering},
+  volume={40},
+  number={18},
+  pages={3313--3324},
+  year={1997},
+  publisher={Wiley Online Library}
+}
+
+@article{dataset,
+  title={Thingi10K: A Dataset of 10,000 3D-Printing Models},
+  author={Zhou, Qingnan and Jacobson, Alec},
+  journal={arXiv preprint arXiv:1605.04797},
+  year={2016}
+}
+
+@inproceedings{metrics,
+  title={A survey of indicators for mesh quality assessment},
+  author={Sorgente, Tommaso and Biasotti, Silvia and Manzini, Gianmarco and Spagnuolo, Michela},
+  booktitle={Computer graphics forum},
+  volume={42},
+  number={2},
+  pages={461--483},
+  year={2023},
+  organization={Wiley Online Library}
+}
