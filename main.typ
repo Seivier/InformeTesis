@@ -34,6 +34,7 @@
   generar una malla de poliedros manteniendo su características en rasgos generales. El
   presente trabajo se centrará en esta última forma.
 
+
   // Para aplicar simulaciones de ecuaciones diferenciales parciales sobre cuerpos,
   // comúnmente se hace uso de triángulos o tetraedros como primitivas debido a su
   // simpleza y las propiedades que contienen. Métodos como el Método de Elementos
@@ -482,6 +483,9 @@
 ]
 
 #capitulo(title: "Trabajo anterior")[
+  El trabajo propuesto forma parte de una familia mayor de algoritmos llamados Polylla, los cuales se basan en la idea de
+  unir primitivas bajo un criterio geometrico. En particular, actualmente existe una versión
+  bidimensional el cual construye polígonos, y extensiones a tres dimesiones para crear poliedros.
 
   #comentario[
     Pauta:
@@ -499,6 +503,11 @@
 
 #capitulo(title: "Algoritmo de cavidades")[
   #comentario[Deberia mencionar la intención de unir todo el ecosistema como una sola libreria? Que tal la herramienta para testear la calidad de las mallas?]
+  Como se observa, en tres dimensiones, podemos caracterizar los algoritmos por la forma en la que unen las primitivas y los criterios utilizados para distinguir
+  que unión es mejor con respecto a otra. Polylla Edge y Face corresponde a una clasificación en la forma, mientras que los criterios de unión corresponden a una
+  clasificación de segundo tipo. Con esto en mente podemos generalizar el algoritmo Polylla 3D
+
+
   == Arquitectura
   == Visualización
 ]
