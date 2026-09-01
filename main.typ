@@ -132,28 +132,31 @@
   // aplicarlo con mallas de poliedros no convexos.
   //
   Debido al creciente interés y consolidación de nuevos métodos numéricos, como el
-  método de elementos virtuales #comentario[Habria que poner cita aca??] (_VEM_ por sus siglas en inglés),
+  método de elementos virtuales @veiga2012basic (_VEM_ por sus siglas en inglés),
   se necesita disponer un algoritmo que sea escalable con respecto a la cantidad
   de células (tetraedros) mientras contenga propiedades deseables para que dicho método
-  funcione correctamente. No obstante, el estudio realizado sobre POYLLA 3D dio
+  funcione correctamente. No obstante, el estudio realizado sobre POLYLLA 3D dio
   resultados poco satisfactorios en este ámbito, donde se concluyó que uno de los algoritmos,
   POLYLLA 3D Face, era capaz de obtener buenos resultados, pero que la ausencia de _kernel_ en ciertos
   poliedros podría afectar su usabilidad para VEM @pol3d.  Con esto en mente se propone una nueva forma de
-  crear poliedros, alejada de la tradicional forma de unir triángulos por sus arista de POLYLLA 2D: usando cavidades.
-  Dichas cavidades se corresponden a la esfera inscrita de cada tetraedro, es decir,
-  a la esfera en cuya superficie se encuentran todos los vertices del tetraedro.
+  crear poliedros, alejada de la forma tradicional de unir triángulos por sus aristas en POLYLLA 2D: usar cavidades.
+  En este trabajo, las regiones candidatas se definen a partir de la circunsfera
+  asociada a cada tetraedro semilla, es decir, la esfera que pasa por sus cuatro
+  vértices. Esta debe distinguirse tanto de la esfera inscrita, tangente a las
+  cuatro caras, como de la cavidad de Bowyer--Watson, que es un conjunto de
+  tetraedros en conflicto respecto de un punto de inserción @tetgen.
 
 
   == Hipótesis
-  Es posible implementar un algoritmo que genera mallas de
+  Es posible diseñar e implementar un algoritmo que genere mallas de
   poliedros a partir de una malla de tetraedros utilizando las cavidades de dichos tetraedros,
   seleccionando unos como semilla para formar el poliedro. Tal algoritmo resultaría más eficiente y robusto que otros implementados en la familia Polylla, produciendo mallas de calidad según los criterios de los métodos numéricos.
   == Preguntas de investigación
   #enum(numbering: (..nums) => text(weight: "bold", "Pregunta " + numbering("1", ..nums)))[
     ¿Es posible crear poliedros a partir de un algoritmo de generación de
-    poliedros basado en cavidades? ¿Cómo se debería escoger las semillas para formar los poliedros? ¿Qué pasos de refinamiento se deberían realizar con la malla creada?
+    poliedros basado en cavidades? ¿Cómo se deberían escoger las semillas para formar los poliedros? ¿Qué pasos de refinamiento se deberían realizar sobre la malla creada?
   ][
-    ¿Que estructura de datos puede proveer un uso eficiente de memoria y tiempo de
+    ¿Qué estructura de datos puede proveer un uso eficiente de memoria y tiempo de
     ejecución permitiendo manejar la topología de la malla? ¿Es posible crear una estructura que permita unir todos los algoritmos dentro de la familia Polylla?
   ][
     ¿El algoritmo final es una solución viable para problemas con mallas típicas?
@@ -167,13 +170,13 @@
 
 
   == Objetivos
-  El objetivo general de esta investigación es la de diseñar, implementar y analizar un nuevo
+  El objetivo general de esta investigación es diseñar, implementar y analizar un nuevo
   algoritmo de creación de malla de poliedro de forma indirecta, inspirado en el
   uso de cavidades de los tetraedros.
 
   // == Objetivos específicos
   #enum(numbering: (..nums) => text(weight: "bold", "Objetivo " + numbering("1", ..nums)))[
-    Diseñar e implementar una nuevo algoritmo basado en
+    Diseñar e implementar un nuevo algoritmo basado en
     las cavidades de tetraedros semillas.][
     Crear o seleccionar una estructura de datos que
     sea consistente con un modelo de programación en paralelo.
