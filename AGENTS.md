@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-`main.typ` is the thesis entry point and contains the current chapters. Update personal, degree, and committee information in `my-metadata.typ`; maintain citations in `references.bib`; and place thesis figures in `imagenes/`. The reusable document template is split across `final.typ`, `intro.typ`, `constants.typ`, and `utils.typ`. `metadata.typ`, `example_final.typ`, and `example_intro.typ` demonstrate the template independently of the thesis. Institutional logos live under `imagenes/institucion/`.
+`main.typ` is the thesis entry point and contains the current chapters. Long chapters live in `capitulos/` and are included from `main.typ`. Chapter 2 is `capitulos/estado-del-arte.typ`, which includes one file per section from `capitulos/estado-del-arte/` with level-1 headings; `main.typ` includes it under `set heading(offset: 1)`, and `estado-del-arte.typ` compiles it as a standalone document with cover, outline and references. Update personal, degree, and committee information in `my-metadata.typ`; maintain citations in `references.bib`; and place thesis figures in `imagenes/`. The reusable document template is split across `final.typ`, `intro.typ`, `constants.typ`, and `utils.typ`. `metadata.typ`, `example_final.typ`, and `example_intro.typ` demonstrate the template independently of the thesis. Institutional logos live under `imagenes/institucion/`.
 
 Keep thesis-specific prose and configuration separate from reusable template code. Prefer extending an existing helper in the template files instead of duplicating layout logic in `main.typ`.
 
@@ -14,6 +14,8 @@ Run commands from this repository root:
 - `typst watch main.typ` continuously rebuilds the document while editing.
 - `typst compile example_final.typ` validates the final-document template example.
 - `typst compile example_intro.typ` validates the proposal/report template example.
+- `typst compile estado-del-arte.typ` builds the standalone state-of-the-art chapter PDF.
+- From the parent `Tesis` repository, `.venv/bin/python literatura/scripts/build_thesis_bib.py --typ InformeTesis/main.typ --catalog literatura/papers.json --output InformeTesis/references.bib` regenerates `references.bib` from the citations in `main.typ` and its active `#include` files. Do not edit `references.bib` by hand.
 
 Typst CLI is the only documented local prerequisite. Tinymist for VS Code is optional and provides live preview and language support.
 
