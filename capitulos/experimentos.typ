@@ -1,218 +1,413 @@
-#import "pendiente.typ": pendiente
-
 = Alcance y preguntas de evaluación <sec:ex-alcance>
 
-Este capítulo establece un diseño experimental para contrastar la hipótesis de
-la introducción. Los guiones de las tablas indican ausencia
-de medición, nunca un valor nulo. El objeto de evaluación será la construcción
-secuencial descrita en @sec:ac-algoritmo; la reparación y el diseño paralelo
-requieren desarrollos adicionales antes de incorporarse como variantes. Las cuatro preguntas requieren, respectivamente, validar la construcción,
-comparar representaciones, evaluar viabilidad y comprobar el diseño paralelo.
-La @tab:ex-preguntas establece sus observables.
+La campaña evalúa particiones de una misma malla tetraédrica, con idéntico
+contrato de pertenencia y evaluador geométrico. Se distinguen corrección de la
+partición, calidad, reducción y costo. Un fallo no se transforma en una celda
+unitaria para completar una salida inválida, y una métrica indefinida no se
+sustituye por cero. Los resultados se limitan a geometría y ejecución secuencial;
+no constituyen una validación numérica de VEM ni una medición de aceleración
+paralela.
 
 #figure(
   table(
-    columns: (0.6fr, 2fr, 2fr), inset: 5pt,
-    table.header([*Pregunta*], [*Observables propuestos*], [*Comparación necesaria*]),
-    [1], [Partición, conectividad y kernel],
-    [Órdenes de semillas; con y sin reparación validada],
-    [2], [Memoria y tiempos por fase],
-    [Vectores actuales frente a listas aplanadas futuras],
-    [3], [Reducción, calidad, fallos y recursos],
-    [Cavidades, Face y Edge; igual entrada],
-    [4], [Corrección, tiempo y conflictos],
-    [Secuencial frente a paralela futura],
-  ), caption: [Relación entre preguntas y verificaciones propuestas.],
+    columns: (0.7fr, 2fr, 2fr), inset: 4pt,
+    table.header([*Pregunta*], [*Experimento*], [*Observable*]),
+    [1], [E0 y E1: corrección y semillas], [Partición, volumen, kernel, reducción y aislados],
+    [2], [Evaluador común y E6], [Pertenencia, capacidades por componente y construcción aplanada],
+    [3], [E2, E4 y E5], [Calidad sintética y real, fallos, tiempo y memoria],
+    [4], [E8 condicionado], [Sin variante paralela validada; no se mide aceleración],
+  ), caption: [Preguntas de investigación y alcance efectivo de la campaña.],
 ) <tab:ex-preguntas>
 
-Se distinguirán validez topológica, calidad y costo. Reducir celdas no bastará
-para sostener la hipótesis si aumentan los fallos o se pierde calidad. La aptitud
-para VEM requerirá validación numérica, según @sec:ea-numericos.
+Los criterios se fijaron antes de las mediciones principales. La partición debe
+cubrir cada tetraedro exactamente una vez, contener celdas conexas por caras y
+exponer únicamente las caras de multiplicidad uno dentro de cada celda. Se
+verifica la conservación de volumen con tolerancia relativa $10^(-9)$ y se
+registran rechazos con su causa. Estas condiciones no demuestran simplicidad de
+toda frontera ni admisibilidad para un método numérico.
 
-Antes de medir se propone fijar criterios de aceptación: cada tetraedro válido
-pertenecerá a una sola celda, cada celda será conexa por caras y su frontera se
-contrastará con las incidencias del conjunto de tetraedros. Se comprobará la
-conservación del dominio mediante volúmenes con orientación controlada. Los
-casos que incumplan estas verificaciones se registrarán como fallos; no se
-incorporarán silenciosamente a promedios de calidad.
-
-#pendiente[Validación inicial: implementar un verificador de cobertura,
-  exclusividad, conectividad y frontera; contrastarlo con mallas pequeñas de
-  solución inspeccionable. Definir con el autor tolerancias y criterios de
-  aceptación antes de procesar el conjunto completo. Registrar entradas
-  rechazadas y causa de rechazo.]
+Para la hipótesis de calidad se conservó el umbral propuesto de una ventaja de
+al menos cinco puntos porcentuales en la mediana de diferencias pareadas de
+$f_K$, con intervalo del 95 % enteramente positivo, en al menos tres familias
+sintéticas y en la muestra real. La reducción se contrasta frente a un margen de
+diez puntos porcentuales respecto de Face. Estos umbrales no se ajustaron al
+observar resultados desfavorables.
 
 = Métricas y reglas de interpretación <sec:ex-metricas>
 
-Para una entrada con $N_T$ tetraedros válidos y una salida con $N_P$ poliedros,
-se propone medir la reducción $R = 1 - N_P / N_T$ y la razón $N_T / N_P$,
-siempre que ambos conteos sean positivos. Se registrarán mínimo, mediana y máximo
-de tetraedros por celda y la fracción de celdas con un único tetraedro. Los
-conteos se obtendrán de elementos válidos, sin confundirlos con posiciones
-reservadas de los vectores. El lector actual puede insertar un elemento ficticio
-para numeración desde uno; esta condición deberá resolverse antes de medir. Para el kernel se propone registrar $f_K = N_K / N_P$, donde $N_K$ cuenta
-celdas con kernel calculado no vacío, acompañado por la cantidad de cálculos
-fallidos o indeterminados. La implementación representa la presencia de kernel
-mediante un registro opcional que depende de los vértices devueltos por la
-biblioteca externa. Por ello, $f_K$ describirá inicialmente ese procedimiento,
-cuya validación con casos analíticos es un requisito previo. Las razones disponibles son las de @sec:ac-metricas: arista mínima sobre máxima,
-volumen del poliedro sobre volumen del kernel y área del poliedro sobre área de
-su envolvente convexa. La razón volumétrica no mide volumen del poliedro sobre
-volumen de la envolvente. Se propone informar sus distribuciones por malla,
-separando celdas sin kernel, denominadores nulos y valores no finitos. No se
-promediará el cero que el código usa como sustituto de kernel ausente junto con
-razones volumétricas definidas. El ejecutable cronometra lectura, algoritmo y escritura en milisegundos; su suma
-no incluye el cálculo de estadísticas. Se propone conservar esos tres tiempos
-y añadir tiempo completo del proceso y tiempo de estadísticas por separado.
-La memoria se evaluará mediante el máximo residente del proceso y un inventario
-de contenedores, distinguiendo entrada, salida, auxiliares y copias. Para comparar
-representaciones, se conservarán idénticos algoritmo, entrada y opciones. Se informará mediana e intervalo intercuartílico temporal por entrada. La calidad
-se resumirá por malla para no confundir variabilidad de ejecución y geométrica.
+Para $N_T$ tetraedros y $N_P$ celdas se define $R=1-N_P/N_T$. Se conservan también
+la distribución de tetraedros por celda y la fracción de celdas unitarias. Los
+identificadores de entrada se remapean sin posiciones ficticias. Todos los
+comparadores entregan un entero por tetraedro; ese archivo permite reconstruir
+la misma representación y aplicar el mismo verificador y evaluador.
 
-#pendiente[Instrumentación: corregir `createStats` y verificar encabezados,
-  separadores y valores; añadir conteos por celda y memoria máxima. Validar
-  orientación, kernel y razones con casos analíticos. Probar un lector del CSV
-  detallado que descarte la columna vacía final y separe estados inválidos.]
+El evaluador común usa coordenadas y acumulaciones en doble precisión. Orienta
+cada triángulo exterior mediante el vértice opuesto de su tetraedro incidente.
+El volumen de una celda es la suma de valores absolutos de los volúmenes de sus
+tetraedros. El kernel se obtiene como intersección de semiespacios exteriores,
+con un problema lineal de centro de Chebyshev y construcción geométrica mediante
+Qhull. Las coordenadas se trasladan al promedio de los vértices y se normalizan
+por la diagonal de la caja de la celda. Un resultado vacío de la construcción
+geométrica, por sí solo, no certifica ausencia de kernel.
+
+En celdas de un solo tetraedro numéricamente dudosas se comprueba la orientación
+con aritmética racional exacta sobre las coordenadas binarias de entrada. Si no
+son coplanares, la convexidad demuestra que el kernel es la propia celda y la
+razón de volúmenes vale uno. Se conservan sus cuatro caras, evitando una fusión
+por tolerancia que colapse tetraedros muy delgados. Esta resolución analítica
+se aplica uniformemente y queda registrada junto a los resultados primarios.
+
+Se exportan cuatro estados:
+
+- *Presente:* kernel tridimensional de volumen positivo, con verificaciones de
+  factibilidad y de la razón de volumen.
+- *Ausente confirmado:* incompatibilidad de semiespacios con margen negativo
+  superior a la tolerancia numérica adoptada.
+- *Indeterminado:* margen cercano a cero, posible degeneración del kernel o
+  construcción geométrica sin confirmación suficiente.
+- *Error:* el cálculo no produjo una métrica utilizable y se conserva su causa.
+
+Toda ausencia primaria se verifica además con una combinación dual no negativa
+de los semiespacios. Su cota mínima en la caja normalizada $[-1,1]^d$ debe ser
+positiva, descontando el error de acumulación flotante y superando $10^(-8)$.
+Se conservan los pesos, el residuo y el margen. Una ausencia no certificada pasa
+a indeterminada en un registro derivado, mientras la salida primaria permanece
+intacta. Esta auditoría uniforme precede al análisis y no modifica los umbrales
+de las hipótesis.
+
+El umbral de margen es $10^(-8)$ en coordenadas normalizadas. Si $N_+$ cuenta
+presencias confirmadas y $N_u$ reúne indeterminados y errores, la fracción se
+informa mediante
+
+$ f_K^- = N_+ / N_P, quad f_K^+ = (N_+ + N_u) / N_P. $
+
+Estas cotas expresan incertidumbre numérica; no son intervalos de confianza
+estadísticos. La comparación de kernel entre dos variantes usa también la
+cota conservadora $f_(K,C)^- - f_(K,B)^+$. Los promedios y cuantiles de métricas
+parcialmente definidas conservan su número de observaciones válidas.
+
+Se exporta $V(K)/V(P)$ además de la razón histórica inversa, que permanece
+indefinida si el kernel tiene volumen nulo. Se calculan arista mínima/máxima,
+área de celda/envolvente, diámetros de caras y celda, y números de caras y
+aristas. Los conteos y razones se informan tanto sobre la triangulación exterior
+como tras unir triángulos coplanares adyacentes y retirar subdivisiones
+colineales. Una frontera fusionada con agujeros o ramificaciones deja sus
+métricas sin valor; no altera el estado del kernel tridimensional.
+
+Las componentes $rho_1$, $rho_2$ y $rho_3$ siguen las ecuaciones (29)–(31) de
+@sorgente2022polyhedral. Se usan el volumen relativo del kernel, las escalas
+geométricas y los conteos de frontera. El indicador global sigue su ecuación
+(32):
+
+$ rho = sqrt(1/N_P sum_(P) rho_1(P)(rho_2(P)+rho_3(P))/2). $
+
+Cuando hay contribuciones indefinidas se informa una cota para la malla completa
+permitiendo que cada contribución faltante pertenezca a $[0,1]$. Los resúmenes
+condicionados a celdas resueltas se identifican aparte. La razón de superficies
+se conserva como descriptor geométrico, sin convertirla en un criterio suficiente
+de aptitud para VEM.
 
 = Conjunto de entradas y comparadores <sec:ex-datos>
 
-La @tab:ex-datos transcribe exclusivamente el primer campo de los encabezados
-`.node` y `.ele` locales. Son cantidades declaradas de entrada, no mediciones de
-salida ni evidencia de validez de los archivos. El nombre de un archivo no se
-utiliza para inferir su distribución espacial o su procedencia.
+Las ocho mallas legadas se usan para regresión: `basic`, `minimal`, `3D_100`,
+`socket`, `1000points`, `1000points07`, `mage` y `angel`. No se atribuye procedencia
+real a sus nombres. Las familias sintéticas reproducen el diseño general de
+@salinasfernandez2025exploring, usando TetGen 1.6.0 como triangulador común en el
+cubo unitario y tamaños objetivo de 500, 1000, 5000, 10000 y 50000 vértices.
 
 #figure(
   table(
-    columns: (2fr, 1fr, 1fr), inset: 4pt,
-    table.header([*Prefijo en `data/`*], [*Vértices*], [*Tetraedros*]),
-    [basic], [8], [5],
-    [minimal], [8], [5],
-    [3D_100], [100], [535],
-    [socket], [836], [2285],
-    [1000points], [1000], [4374],
-    [1000points07], [1000], [6274],
-    [mage], [3881], [19211],
-    [angel], [24979], [90087],
-  ), caption: [Inventario declarado en los pares locales de archivos TetGen.],
+    columns: (1fr, 2.4fr, 0.8fr), inset: 4pt,
+    table.header([*Familia*], [*Construcción*], [*Mallas distintas*]),
+    [Random], [Puntos uniformes y ocho esquinas; semillas 1–5], [25],
+    [Poisson], [Muestreo Poisson-disk con radio calibrado; semillas 1–5], [25],
+    [Grid], [Rejilla regular con $k=ceil(N^(1/3))$], [5],
+    [Quality], [Refinamiento PLC del cubo; calidad 1.414 y volumen calibrado], [5],
+  ), caption: [Conjunto sintético principal. Se conservan los tamaños efectivos de cada archivo.],
 ) <tab:ex-datos>
 
-Los casos pequeños servirán para inspección. Los restantes no constituyen una
-serie de escalabilidad, pues cambian tamaño y geometría. Se propone generar
-familias con dominio fijo, densidad creciente y semillas registradas; sus tamaños
-se fijarán mediante un piloto. Como extensión se proponen distribuciones aleatorias, Poisson y regulares en un
-cubo, junto con entradas con criterios de calidad controlados. P005 emplea esas
-familias en su evaluación de Face @salinasfernandez2025exploring; ello justifica
-considerarlas como diseño comparativo, sin afirmar que los archivos locales
-pertenezcan a esas categorías. Se añadirían dominios no convexos y casos de
-radios iguales, reescalamiento y tetraedros próximos a degeneración para estudiar
-robustez. Cada entrada nueva deberá incluir origen, licencia, generador, opciones,
-semilla, encabezados y huella del archivo. Los comparadores serán Face con área máxima y radio inscrito máximo de la cara,
-según @sec:ta-criterios, y Edge una vez resuelto el pendiente documental de
-@sec:ta-face-edge. Se evaluará la salida antes y después de reparar únicamente
-cuando ambas rutas estén verificadas. El programa actual invoca directamente
-`CavityAlgorithm`; no dispone de una opción de línea de comandos que seleccione
-Face o Edge. Los resultados publicados del capítulo 3 serán contexto, no filas
-comparables a mediciones locales realizadas con otro equipo o conjunto de datos.
+Grid y el refinamiento de Quality son deterministas bajo esta receta. Repetir
+cinco veces su parámetro nominal de semilla produciría copias; por ello se usan
+60 mallas distintas, sin tratar esas copias como observaciones independientes.
+E1 compara radio creciente, decreciente, índice y permutación con semilla en los
+tamaños objetivo 1000 y 10000.
 
-#pendiente[Entradas y baselines: verificar índices y orientación de los ocho
-  pares, registrar procedencia y huellas; preparar las familias controladas.
-  Obtener la fuente primaria de Edge e integrar adaptadores Face y Edge con
-  idéntico contrato de salida y evaluación. Documentar sus comandos reales solo
-  cuando existan; no hay un comando de selección de variante en la CLI actual.]
+Para E4 se parte del subconjunto de 1806 superficies de Thingi10K distribuido con
+el estudio de kernel de @sorgente2022polyhedron. Antes de medir calidad se
+sortearon 180 candidatos sin reemplazo, con semilla 1, y se añadieron los dos
+modelos de referencia del plan. El filtro exige una componente, superficie
+cerrada, género cero, ausencia de degeneraciones y tamaño del archivo OFF distribuido inferior a 1 MB. Se
+registra la licencia individual y se comprueban intersecciones con TetGen antes
+de generar tetraedros. Esta ruta no repara superficies defectuosas.
+
+De 182 candidatos, 142 cumplieron el preprocesamiento. Se formaron terciles por
+número efectivo de tetraedros y se sortearon 20 modelos por estrato. Se añadió
+una referencia no seleccionada previamente: 61 modelos en total, de los cuales
+60 integran las inferencias principales. Los 40 rechazos y sus causas permanecen
+en el manifiesto. El preprocesamiento admite entre $10^4$ y $10^6$ tetraedros,
+solicitando calidad 1.414, con límite de 150000 puntos Steiner, 600 segundos y 2 GiB de espacio
+de direcciones por candidato. La selección describe este subconjunto aceptado,
+no todos los modelos de Thingi10K. La opción de calidad solicitada al mallador
+no se interpreta como una certificación independiente de la calidad de cada
+tetraedro, especialmente bajo el límite de puntos Steiner.
+
+Los comparadores principales son Face por área y radio inscrito geométrico,
+antes y después de reparar, Edge como implementación de referencia no
+publicada, y una agregación de pares inspirada en @sorgente2022polyhedral. Face
+se parametrizó fuera del checkout de referencia y se portó a C++. Se normaliza
+su puntuación máxima y se redondea a $10^(-12)$ antes de desempatar por índice
+canónico de cara; así se evita que diferencias de redondeo entre lenguajes
+resuelvan de forma distinta los empates de Grid.
+
+La expresión histórica de Face para el radio inscrito utiliza lados al cuadrado
+en la fórmula de Herón. La comparación principal emplea el radio geométrico y
+declara esta corrección; no se identifica silenciosamente con aquella expresión.
+La regresión contiene 128 comparaciones C++/Python: 101 particiones idénticas y
+27 rechazos coincidentes de reparación. No hubo discrepancias entre particiones
+aceptadas. Los fallos de reparación permanecen como resultados de la campaña.
 
 = Protocolo reproducible <sec:ex-protocolo>
 
-Se propone fijar la revisión del código,
-las revisiones de dependencias, el compilador, sus opciones de optimización y la
-configuración de construcción. El registro de hardware contendrá modelo de CPU,
-núcleos físicos y lógicos, RAM, sistema operativo y almacenamiento. Si se
-implementa una variante GPU se añadirán dispositivo, memoria, controlador y
-entorno de compilación. Se propone realizar una ejecución de calentamiento y
-diez repeticiones medidas
-por combinación de entrada y variante, cada una en un proceso independiente.
-Se alternará el orden de variantes y se mantendrán equipo, estado energético y
-carga de fondo controlados. Se conservarán todas las observaciones; cualquier
-exclusión deberá justificarse por una causa registrada. Los fallos y límites de
-recursos se reportarán aunque impidan completar las repeticiones.
+La plataforma efectiva es Ubuntu/WSL sobre Windows, en lugar del Mac previsto
+inicialmente. El manifiesto conserva CPU y memoria expuestas a WSL, sistema,
+compilador, opciones Release, revisiones de dependencias, fuentes congeladas y
+SHA-256 de binarios, entradas y pertenencias. Las revisiones de QuickHull y
+polyhedron-kernel se fijaron por commit. El código de referencia `3D-Polylla` se
+conservó sin modificaciones y TetGen se compiló desde una copia externa.
 
-La CLI recibe `-n`, `-e` y `-o`; `--detail-stats` requiere además
-`--make-stats` para producir detalle. Tras localizar el binario construido y
-crear el directorio de salida, una ejecución futura desde `3D-GPolylla/` tendrá
-la siguiente forma. La ruta del binario es la esperada para una construcción
-CMake con directorio `build`; deberá comprobarse en el equipo final.
+E0 comprende once pruebas C++ y trece pruebas Python, que abarcan geometría,
+CSV, análisis estadístico, certificados duales y preservación de los datos
+primarios durante la auditoría. Incluye cubo, dominio en L con kernel
+conocido y dominio en U sin kernel. La validación sobre el nivel más grueso del conjunto publicado de
+@sorgente2022polyhedral reconstruyó sus 175 tetraedros y 140 agregados,
+con volumen total uno y presencia de kernel en todas esas celdas. Se verificó
+también la componente de conteo $rho_3=1$ en los tetraedros. Esto verifica la
+importación y casos geométricos del conjunto; no reproduce una simulación VEM.
+Una validación adicional de 48 casos mantuvo
+la partición canónica bajo las cuatro familias, cuatro órdenes, tres escalas y
+traslación. Las pruebas y el piloto preceden a las inferencias; no sustituyen
+los controles de cada corrida.
+
+Cada pareja de malla y variante se ejecuta dos veces en procesos independientes,
+conservando igualdad de partición canónica antes de evaluar calidad. El evaluador
+es común a todas las variantes. Se permiten cuatro trabajadores de calidad, con
+límite de 1800 segundos por tarea y 3 GiB de espacio de direcciones por proceso.
+Esos tiempos concurrentes no se usan como evidencia de eficiencia del núcleo.
+
+E5 se ejecuta después de terminar las etapas de calidad y de forma secuencial.
+Por entrada y variante se realiza un calentamiento y diez procesos medidos,
+rotando el orden de variantes y dejando dos minutos de reposo entre bloques.
+La lectura, construcción con validación, comprobación adicional y escritura de
+pertenencia se registran por separado. GNU time mide el máximo residente en
+KiB, convertido a MiB al presentar resultados. El presupuesto por proceso es de
+30 minutos y 75 % de la memoria de WSL como límite de espacio de direcciones.
+No se confunde este límite con el RSS observado. No se controlan la temperatura
+ni las cargas ajenas a la campaña del sistema anfitrión.
+
+Para los tamaños núcleo de E5 se mide además una ejecución independiente del
+evaluador, separando lectura, estadísticas acumuladas por celda y
+agregación/exportación. No se suma ese proceso Python a un tiempo nativo como si
+fuera una misma ejecución. Solo se comparan tiempos C++ entre Cavidades y Face;
+Edge Python participa en calidad.
+
+Una ejecución del núcleo experimental tiene la forma siguiente, desde
+`3D-GPolylla/`, con el directorio de salida creado previamente:
 
 ```sh
-mkdir -p resultados/basic/r01
-build/src/exe/GPolyllaExe \
-  -n data/basic.node -e data/basic.ele \
-  -o resultados/basic/r01/cavity.visf \
-  --make-stats --detail-stats
+build/src/exe/GPolyllaExperiment \
+  entrada.node entrada.ele cavity-ascending salida/cavity 1
+build/src/exe/GPolyllaExperiment \
+  entrada.node entrada.ele face-incircle-repair salida/face 1
 ```
 
-El programa deriva `cavity.csv`, `cavity_detail/details.csv` y archivos OFF por
-celda del nombre de salida. El tiempo externo incluirá esas exportaciones.
-Se propone anteponer `/usr/bin/time -l` en macOS o `/usr/bin/time -v` en Linux,
-verificando las unidades de memoria del equipo. Las ejecuciones sin estadísticas
-se identificarán como otra configuración.
+Se exportan pertenencia, tiempos y logs. E6 construye efectivamente listas
+aplanadas y compara sus capacidades con las listas actuales, manteniendo
+idénticos los arreglos comunes. Un inventario separado distingue entrada, copia
+común de salida y auxiliares retenidos. El tiempo de la muestra aplanada incluye reservar, llenar y liberar los
+contenedores; no es una comparación de velocidad. Estos conteos no incluyen
+metadatos del asignador ni representan el pico del proceso; ese pico se conserva mediante RSS.
 
-#pendiente[Campaña reproducible: el autor deberá fijar el equipo, resolver los
-  requisitos de compilación de @sec:ac-arquitectura y validar las exportaciones.
-  Después, ejecutar el comando indicado para cada prefijo y repetición, usando
-  carpetas distintas, conservar salida estándar y errores, recursos y manifiesto
-  de versiones. No iniciar la campaña antes de validar entradas y métricas.]
+La unidad de análisis estadístico es la malla. Se usan diferencias pareadas,
+10000 remuestreos bootstrap para intervalos del 95 % de la mediana y una semilla
+fija. La prueba de Wilcoxon usa parejas sin estados de kernel indeterminados o
+erróneos, con corrección de Holm sobre las cuatro familias y la muestra real
+por comparador. Se informa también cobertura de parejas; un resultado sobre un
+subconjunto aceptado no se convierte en evidencia de toda la población prevista.
+En la muestra real el remuestreo conserva los estratos. En Random y Poisson
+se añade una sensibilidad por grupos de semilla entre tamaños, pues reutilizar
+la misma semilla puede correlacionar generaciones de distinta densidad. El
+contraste principal por malla sigue el plan; la sensibilidad no modifica sus
+umbrales y limita la interpretación de los valores p nominales. Grid y Quality
+son familias deterministas con cinco tamaños observados, no cinco réplicas
+aleatorias por tamaño.
+Las razones de tiempos se obtienen de medianas por entrada y variante. Los
+fallos nunca se incorporan como tiempos o calidades nulos.
 
-= Tablas previstas y criterio de contraste <sec:ex-tablas>
+= Resultados y contraste <sec:ex-tablas>
 
-Las siguientes tablas fijan el formato de presentación. Cada fila se desagregará
-por malla, variante, criterio y estado de reparación. Todas las celdas de
-resultados permanecen vacías; no se extrapolan cifras de otros trabajos.
+#[
+  #set par(justify: false)
+  #show figure.where(kind: image): set figure(placement: top)
+  #include "resultados-campana.typ"
+]
+
+== Corrección, cobertura y fallos
+
+E1/E2 procesaron 492 tareas y E4 otras 427: las 919 combinaciones previstas
+recibieron un resultado o un fallo con causa. Tras la auditoría, 662 salidas
+quedaron completas, cuatro conservaron errores parciales de métrica y 253
+fallaron. Estas últimas comprenden 200 particiones incompletas, 51 particiones
+no conexas y dos rechazos de tetraedros degenerados por el lector nativo. Un
+fallo no cuenta como una observación geométrica válida.
+
+Cavidades completó las 60 mallas sintéticas principales y las 72 ejecuciones
+adicionales de órdenes. En la muestra real aceptó 58 de 60 modelos estratificados,
+además de la referencia suplementaria. Rechazó los modelos 37274 y 314440 por
+volumen tetraédrico degenerado en la aritmética del lector. Face sin reparación
+produjo particiones en los 60 modelos estratificados; esto no elimina la
+necesidad de verificar sus métricas. Las reparaciones de Face tuvieron baja
+cobertura: 3/60 y 4/60 salidas reales válidas según criterio. Edge produjo 14/60.
+No se generalizan sus comparaciones desde ese subconjunto al conjunto previsto.
+
+La auditoría confirmó las 178596 ausencias primarias mediante certificados
+duales y resolvió analíticamente 41 tetraedros delgados. No degradó ausencias
+por falta de certificado. Permanecen 38 celdas con error de métrica en cuatro
+particiones Face de los modelos 106559 y 37274. Las cotas de kernel incluyen
+esas celdas y los estados indeterminados. El verificador comprueba hashes,
+pertenencias, cobertura de tareas y consistencia entre CSV detallados y JSON;
+no convierte los errores restantes en una certificación geométrica completa.
+
+== Órdenes de semillas
+
+E1 compara cada orden con radio creciente sobre diez entradas Random, diez
+Poisson, dos Grid y dos Quality. En Random, el radio decreciente aumenta la
+reducción una mediana de 10.67 puntos porcentuales, pero su diferencia de
+fracción de kernel queda acotada por medianas de −6.69 y −4.26 puntos. En
+Poisson, el aumento de reducción es 10.66 puntos y las medianas de las cotas de
+diferencia de kernel son −2.11 y −0.51 puntos. El orden por índice y la
+permutación también aumentan la reducción a costa de menor kernel confirmado
+en esas familias. Grid conserva ambas magnitudes para todos los órdenes.
+
+Estos resultados apoyan el radio creciente como compromiso operativo para
+priorizar kernel en las entradas aleatorias evaluadas. No prueban optimalidad
+del orden, ni que una cavidad siempre sea estrellada. Los resultados por malla
+permiten distinguir el efecto de semillas de un cambio de algoritmo.
+
+== Calidad y reducción frente a comparadores
+
+Las medianas de reducción de Cavidades son 80.18 %, 78.06 %, 83.33 % y 77.21 %
+en Random, Poisson, Grid y Quality. Las medianas de las cotas de kernel son,
+respectivamente, 98.58–99.43 %, 99.16–99.73 %, 100–100 % y 99.60–99.90 %.
+En los 58 modelos reales aceptados, la reducción mediana es 76.54 % y las
+medianas de las cotas de kernel son 99.52–99.93 %. Las medianas de las dos
+cotas no constituyen un intervalo de confianza de un parámetro poblacional.
+
+La hipótesis H3a exige una ventaja mediana conservadora de cinco puntos
+porcentuales, con intervalo positivo, en tres de cuatro familias y en datos
+reales. Frente a Face por área, las ventajas conservadoras son 4.93, 1.42, 0 y
+0.37 puntos en las cuatro familias: ninguna alcanza cinco. Frente a Face por
+radio, Random alcanza 5.08 puntos, con IC95 % de 4.68–6.56; Poisson, Grid y
+Quality quedan en 1.99, 0 y 0.55 puntos. Por ello H3a no queda respaldada con el
+umbral fijado, aun cuando varias diferencias son positivas.
+
+En las 58 parejas reales disponibles, la ventaja conservadora frente a Face
+área es 1.93 puntos, IC95 % de 0.98–2.79, y frente a Face radio es 1.76 puntos,
+IC95 % de 1.04–2.91. Ninguna cumple el efecto exigido; además faltan dos parejas
+respecto del diseño. Los intervalos bootstrap describen las parejas observadas,
+condicionados al preprocesamiento y a la aceptación de ambos procedimientos.
+La sensibilidad agrupada por semilla no revierte el signo de las ventajas en
+Random y Poisson. El contraste de Wilcoxon queda sin estimar cuando ninguna
+pareja tiene kernel completamente resuelto; un valor ausente no se interpreta
+como aceptación de igualdad.
+
+El compromiso aparece en la reducción. Frente a Face área, Cavidades pierde
+medianas de 7.19 puntos en Random, 4.73 en Poisson y 2.39 en Quality, y gana
+33.33 en Grid. Frente a Face radio, las diferencias son −4.66, −2.34, +33.33 y
+−1.41 puntos. Las medianas satisfacen el margen descriptivo de −10 puntos de
+H3b. Sin embargo, frente a Face área solo 76 % y 92 % de las mallas Random y
+Poisson cumplen ese margen individualmente; no se afirma no inferioridad
+uniforme. En las parejas reales las diferencias medianas son −4.02 y −2.64
+puntos, con cumplimiento individual del margen en 70.69 % y 81.03 %.
+
+Edge y Pares alcanzan kernel confirmado en todas las celdas de sus salidas
+válidas, con menor reducción que Cavidades salvo el empate Grid de Edge.
+Pares reduce aproximadamente 20 % por construcción y no persigue el mismo
+nivel de agregación. Estos resultados muestran que una fracción alta de kernel
+no basta para elegir una estrategia sin considerar reducción, cobertura y costo.
+
+== Recursos y representación
+
+E5 produjo 700 mediciones en 70 grupos de diez. La pertenencia fue estable en
+cada grupo y coincidió con calidad en las 34 comparaciones que compartieron una
+partición de referencia. @tab:ex-recursos muestra los mayores tamaños del
+conjunto núcleo por variante. La lectura, el algoritmo con validación, la
+comprobación adicional y la escritura se conservan por separado.
+
+La ventaja temporal de H3c depende de la familia. En Quality, el primer tamaño
+con intervalo de la razón Cavidades/Face completamente bajo uno fue un millón
+de vértices objetivo para Face radio y dos millones para Face área. A cuatro
+millones objetivo, Cavidades tomó 67.11 s de algoritmo, frente a 71.24 s y
+72.34 s de Face. Las razones fueron 0.942 (IC95 % 0.936–0.952) y 0.928
+(IC95 % 0.922–0.937). En Random, las razones no mostraron ventaja de Cavidades
+frente a Face sin reparación. En su mayor entrada, Cavidades tomó 64.95 s
+frente a 39.77 s y 39.98 s, con razones de 1.633 y 1.625. Las reparaciones
+exitosas de entradas pequeñas fueron más lentas y los rechazos limitaron su
+cobertura a tamaños bajos.
+
+A cuatro millones objetivo, la lectura dominó el tiempo nativo total. Cavidades
+leyó la entrada Random en 461.69 s de una mediana total de 554.05 s. Las 34
+mediciones independientes del evaluador permiten separar ese costo de las
+estadísticas. En Random de 50000 vértices, las estadísticas por celda de
+Cavidades sumaron 112.62 s en la ejecución Python instrumentada.
 
 #figure(
   table(
-    columns: (1.5fr, 1fr, 1fr, 1fr, 1fr), inset: 5pt,
-    table.header([*Variante / malla*], [*$N_P$*], [*$R$*], [*$f_K$*], [*Aislados*]),
-    [Cavidades / malla], [—], [—], [—], [—],
-    [Face área / malla], [—], [—], [—], [—],
-    [Face radio / malla], [—], [—], [—], [—],
-    [Edge / malla], [—], [—], [—], [—],
-  ), caption: [Plantilla de reducción y calidad; sin resultados.],
-) <tab:ex-calidad>
+    columns: (0.9fr, 1fr, 1fr, 1.7fr), inset: 4pt,
+    table.header([*Familia*], [*Vértices efectivos*], [*Tetraedros*], [*Límite al intentar 8 millones objetivo*]),
+    [Random], [4000000], [27021939], [Fallo de asignación en los tres calentamientos nativos],
+    [Quality], [3984891], [24249602], [Generación y calibración superaron 1800 s],
+  ), caption: [Mayor tamaño con diez repeticiones por algoritmo principal y primer límite de escala bajo el presupuesto de E5.],
+) <tab:ex-limites>
 
-#pendiente[Resultado de calidad (@tab:ex-calidad): definir, implementar y validar
-  estados de kernel por celda —presente, ausente confirmado, indeterminado y
-  error— y exportarlos en `details.csv`. Tras validar cada variante y su CSV,
-  obtener conteos de pertenencia y contabilizar los cuatro estados exportados. Calcular reducción desde los
-  conteos válidos y adjuntar distribuciones de las tres razones, con mínimos,
-  medianas, máximos y casos excluidos explícitos.]
+Cavidades alcanzó un RSS máximo de 10.55 GiB en Random y 9.35 GiB en Quality
+para esos tamaños. Random de ocho millones produjo una malla con 54063945
+tetraedros. El recolector original de metadatos agotó memoria al leer entero
+el archivo de elementos. Se recuperaron encabezados y hashes por flujo y se
+usó la malla generada. En los calentamientos posteriores los tres binarios
+reportaron `std::bad_alloc` bajo el límite de espacio de direcciones. En
+Quality, el límite se alcanzó antes de disponer de una entrada calibrada.
+Estos son límites operacionales del entorno y la receta de campaña.
+
+En E6, aplanar las listas por celda redujo su capacidad entre 30.9 % y 51.3 %
+según familia. Al incluir entrada, copia común y auxiliares, la reducción del
+inventario retenido fue entre 3.4 % y 8.0 % (@tab:ex-memoria). La reserva,
+llenado y liberación de los contenedores adicionales tomó entre 1.01 y 1.67 ms
+por caso. Esta medición aísla el costo de construir el contenedor. El ahorro
+en el total retenido se calcula sustituyendo las capacidades de las listas.
+Un backend que use solo esa representación requiere su propia medición de RSS.
+
+Durante E5 el sistema de archivos WSL pasó a solo lectura mientras se generaba
+la entrada Random de dos millones de vértices objetivo. Se conservaron las 290
+repeticiones terminadas y se retomaron las tareas pendientes tras recuperar la
+escritura. Ese incidente de infraestructura no se cuenta como un fallo de
+Cavidades o Face. El manifiesto registra la interrupción; el estado del sistema
+anfitrión limita la interpretación de pequeñas diferencias temporales.
+
+
+= Extensiones y límites del alcance
 
 #figure(
   table(
-    columns: (1.4fr, 1fr, 1fr, 1fr, 1fr), inset: 5pt,
-    table.header([*Variante / malla*], [*Lectura*], [*Algoritmo*], [*Escritura*], [*RAM máx.*]),
-    [Cavidades / malla], [—], [—], [—], [—],
-    [Face / por criterio], [—], [—], [—], [—],
-    [Edge / malla], [—], [—], [—], [—],
-  ), caption: [Plantilla de recursos: tiempos en ms y memoria en MiB.],
-) <tab:ex-recursos>
-
-#pendiente[Resultado de recursos (@tab:ex-recursos): ejecutar la campaña de
-  @sec:ex-protocolo, agregar mediana e intervalo intercuartílico por fase y
-  memoria máxima; añadir tiempo completo y de estadísticas en una tabla
-  complementaria. Para límites de tamaño, aumentar densidad dentro de cada
-  familia y registrar el primer fallo, causa y último caso completado.]
-
-#figure(
-  table(
-    columns: (1.5fr, 1fr, 1fr, 1fr), inset: 5pt,
-    table.header([*Configuración futura*], [*Tiempo núcleo*], [*Tiempo completo*], [*Aceleración*]),
-    [Secuencial / misma entrada], [—], [—], [—],
-    [Paralela / hilos fijados], [—], [—], [—],
-  ), caption: [Plantilla condicionada a implementar y validar paralelismo.],
+    columns: (0.6fr, 1.2fr, 2.6fr), inset: 4pt,
+    table.header([*ID*], [*Extensión*], [*Estado y consecuencia*]),
+    [E3], [Voronoi], [Extensión opcional excluida del núcleo; no se presenta como comparador medido],
+    [E7], [VEM], [Sin solver validado al cierre de E2; no se afirma convergencia ni aptitud numérica],
+    [E8], [Paralelismo], [Sin implementación paralela validada; no se calcula aceleración],
+  ), caption: [Extensiones excluidas conforme a las condiciones del plan.],
 ) <tab:ex-paralelo>
 
-#pendiente[Resultado paralelo (@tab:ex-paralelo): completar el contrato y la
-  implementación de @sec:ac-paralelo, comprobar sus invariantes y ejecutar con
-  tamaño fijo y creciente. Calcular aceleración como tiempo secuencial dividido
-  por paralelo bajo el mismo alcance temporal; registrar hilos, rondas,
-  conflictos y transferencias. No calcular aceleración sin una variante válida.]
-
+Los datos geométricos no verifican por sí solos la convergencia de VEM. La
+selección real excluye modelos que no superaron el preprocesamiento y la
+reparación de Face puede excluir otras parejas; ambas condiciones limitan la
+generalización. Los manifiestos y registros detallados permiten separar una
+hipótesis no respaldada, un cálculo indeterminado y una ejecución fallida.

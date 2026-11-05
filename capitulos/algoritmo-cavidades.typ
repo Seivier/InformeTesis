@@ -59,19 +59,21 @@ Para un tetraedro no degenerado $t$, se denotan por $c_t$ y $r_t$ el centro y el
 radio calculados por `circumsphere`. La circunsfera es la esfera que pasa por sus
 cuatro vértices; el radio se obtiene como la distancia entre el centro calculado
 y el primer vértice. No se trata de la esfera inscrita definida en la
-introducción. La función forma matrices de orden cuatro, calcula determinantes
-y divide por dos veces el determinante de la matriz de coordenadas homogéneas.
-No contiene una comprobación previa de determinante nulo.
+introducción. La versión experimental resuelve un sistema de orden tres referido al primer
+vértice: si $d_i = p_i-p_0$, sus filas son $2d_i^T$ y el término independiente
+es $norm(d_i)^2$. Una factorización LU con pivoteo completo verifica que el
+sistema sea invertible antes de obtener el desplazamiento del centro. Se
+rechazan tetraedros degenerados y esferas con coordenadas o radio no finitos.
 
 Para una semilla $s$, la condición operacional de aceptación de un vecino $t$ es
 
-$ norm(c_t - c_s) < r_s + epsilon, quad epsilon = 10^(-8). $
+$ norm(c_t - c_s) <= r_s (1 + epsilon_r), quad epsilon_r = 10^(-10). $
 
-El valor de $epsilon$ corresponde a `TOLERANCE` en `utils.h`. Aunque el radio se
-almacena como `double` y los determinantes se calculan con `Matrix4d`, `Vertex`
-hereda de `Eigen::Vector3f`: las coordenadas del centro se almacenan en precisión
-simple. La desigualdad reproduce la función `Cavity::isInside`, incluida su
-tolerancia absoluta.
+La desigualdad reproduce `Cavity::isInside` en la versión experimental.
+Coordenadas, centros y radios usan `double`; `Vertex` hereda de
+`Eigen::Vector3d`. La tolerancia es relativa al radio, de modo que el predicado
+no incorpora una longitud absoluta dependiente de las unidades. Esto mejora
+el comportamiento ante reescalamiento, sin constituir un predicado exacto.
 
 La *cavidad construida* $C_s$ es el conjunto de tetraedros alcanzados desde $s$
 por el recorrido de vecinos por cara, aceptados con esa condición y todavía sin
@@ -114,15 +116,17 @@ espacial: todos los tetraedros participan como candidatos.
 El orden induce una prioridad secuencial. Cuando un tetraedro ya pertenece a una
 región anterior, `buildCavities` omite su candidatura. Por ello no basta con
 definir la condición geométrica para especificar el resultado: también se debe
-conservar el orden de las semillas. El comparador de `std::sort` solo evalúa la
-desigualdad entre radios y no incluye un desempate por índice. El código no
-especifica, por tanto, una prioridad total entre candidatos de igual radio.
+conservar el orden de las semillas. El comparador de `std::sort` ordena por radio y desempata por índice de
+tetraedro creciente. Las variantes experimentales permiten además radio
+decreciente con el mismo desempate, orden de índices y una permutación
+pseudoaleatoria con semilla registrada. La prioridad entre radios iguales queda
+así fijada; sus efectos se evalúan en el capítulo experimental.
 
-#pendiente[Justificación de diseño: documentar por qué se eligió comenzar por el
-  menor radio. Contrastar, cuando el autor autorice los experimentos, orden
-  creciente, decreciente y un desempate explícito por índice, registrando número
-  de poliedros, tetraedros aislados y presencia de kernel. La implementación
-  actual demuestra la elección, pero no su superioridad.]
+La comparación E1 de @sec:ex-tablas confirma que el orden afecta tanto la
+reducción como el kernel en las familias aleatorias estudiadas. El radio
+creciente conserva más celdas y una mayor fracción confirmada de kernel que el
+radio decreciente en esas entradas. Este resultado acotado respalda una elección
+operativa; no demuestra superioridad para cualquier malla.
 
 == Recorrido y propiedad exclusiva
 
@@ -137,8 +141,16 @@ Si la cara no tiene un tetraedro al otro lado, se incorpora a la frontera. Si el
 vecino ya tiene propietario, se añade la cara solo cuando ese propietario es
 otra semilla. Cuando el vecino está libre, se compara su circuncentro con la
 esfera de la semilla inicial: si satisface la condición, se continúa
-recursivamente; en caso contrario, se registra la cara de frontera. La esfera
-usada no cambia al avanzar por el recorrido.
+mediante una pila explícita de marcos; en caso contrario, se registra
+provisionalmente la cara de frontera. La pila conserva el orden de exploración
+de la formulación recursiva. La esfera usada no cambia al avanzar por el
+recorrido.
+
+La frontera definitiva se reconstruye después de asignar todos los
+propietarios: una cara queda expuesta si no tiene vecino o si los tetraedros
+incidentes pertenecen a celdas diferentes. Este paso es necesario porque un
+vecino rechazado inicialmente puede incorporarse a la misma cavidad por otra
+ruta; conservar aquella cara provisional introduciría una cara interna.
 
 #figure(
   block(width: 100%, inset: 8pt, stroke: 0.5pt)[
@@ -157,6 +169,7 @@ usada no cambia al avanzar por el recorrido.
         visitar(s, s, U, B, C)
         para t en C: R.tetraedros[t].poliedro = |R.celdas|
         R.celdas.agregar(Poliedro(U, B, C))
+      reconstruir fronteras desde los propietarios finales
       devolver R
     ```
   ],
@@ -185,8 +198,9 @@ usada no cambia al avanzar por el recorrido.
           B.agregar(f)
     ```
   ],
-  caption: [Recorrido recursivo de `DepthFirstSearch::operator()` en
-    `src/cavity.cpp`. La pertenencia se evalúa siempre respecto de la semilla.],
+  caption: [Formulación recursiva equivalente al recorrido implementado con
+    pila explícita en `src/cavity.cpp`. Las caras son provisionales hasta la
+    reconstrucción final; la pertenencia se evalúa respecto de la semilla.],
 ) <alg:ac-recorrido>
 
 Los identificadores de propietario tienen dos significados distintos. En
@@ -225,17 +239,14 @@ costo constante para las operaciones geométricas de tamaño fijo y los accesos
 por índice.
 
 Los contenedores auxiliares, la salida y las copias requieren espacio
-$O(V + F + N)$ bajo esas mismas condiciones. La profundidad de la recursión puede
-crecer con el número de tetraedros de una región; la cota asintótica no evita un
-agotamiento de pila en recorridos grandes. Estas cotas describen la estructura
+$O(V + F + N)$ bajo esas mismas condiciones. La pila explícita puede crecer con el número de tetraedros de una región,
+pero utiliza memoria dinámica y evita depender de la pila de llamadas. Estas cotas describen la estructura
 del programa, no su escalabilidad observada.
 
-#pendiente[Robustez y validación: definir precondiciones de entrada y tratamiento
-  de tetraedros degenerados, centros no finitos, radios iguales y cambios de
-  escala. Añadir casos de prueba para cada situación y justificar una tolerancia
-  acorde con la precisión de las coordenadas. Sustituir la recursión por una pila
-  explícita si se necesita controlar su memoria; verificar que conserve el orden
-  de visita y la partición.]
+La prueba de Kuhn cubre seis tetraedros cosféricos; el caso casi plano tiene
+altura $10^(-8)$. Se comprueba igualdad de pertenencia del caso pequeño bajo
+escalas $10^(-3)$ y $10^3$ y traslación. Estos ensayos no eliminan la necesidad
+de registrar rechazos numéricos en las campañas grandes.
 
 = Reparación y cobertura de pruebas <sec:ac-reparacion>
 
@@ -258,12 +269,13 @@ terminada ni suponer que basta con habilitar su llamada.
 `test/cavity_test.cpp` contiene una prueba de ejecución que comprueba que los
 contenedores del resultado no estén vacíos y que se conserve la cantidad de
 vértices, además de una comparación con una malla poliédrica de referencia. Hay
-pruebas adicionales para lectura TetGen y escritura VisF. La inspección de esas
-pruebas aporta ejemplos del contrato esperado; no equivale a ejecutarlas ni a
-validar exhaustivamente las propiedades geométricas anteriores. En particular,
-la prueba de lectura aún referencia `mesh.cells`, mientras que `Mesh` expone
-`tetras`; esa prueba requiere actualización antes de emplearla como validación
-de la interfaz vigente.
+pruebas adicionales para lectura TetGen y escritura VisF, actualizadas a
+`Mesh::tetras`. Para la campaña se añadieron cobertura, exclusividad,
+conectividad, frontera, conservación de volumen, empates, reescalamiento,
+traslación, un tetraedro casi plano y rechazo de degeneraciones. Las once
+pruebas C++ se ejecutaron antes de la campaña; el evaluador común añade seis
+pruebas Python de geometría analítica y exportación. Estos casos no constituyen
+una validación exhaustiva de todas las geometrías posibles.
 
 #pendiente[Reparación: decidir si conservar tetraedros aislados es admisible para
   el uso previsto. Si se requiere absorberlos, definir el criterio de aceptación,
@@ -291,26 +303,24 @@ conjunto de dispersión; luego las ordena por sus índices de vértice ordenados
 ambas direcciones de incidencia. El archivo `neighbours.cpp` conserva código
 comentado, por lo que no representa una segunda construcción activa.
 
-La capacidad fija de dos incidencias por cara presupone que no se intentará
-registrar una tercera. El bucle que completa esa información no comprueba
-explícitamente el límite antes de escribir. Además, la numeración de entrada
-requiere atención: los lectores insertan un elemento ficticio si el primer
-índice es uno, tanto para vértices como para tetraedros. Los recorridos
-posteriores comienzan en cero. Esto identifica una condición que debe revisarse
-antes de aceptar de manera general entradas con numeración desde uno.
+El lector experimental rechaza caras con más de dos incidencias. Remapea
+los identificadores externos de vértices a índices internos desde cero,
+independientemente de que el archivo empiece en cero o en uno, sin insertar
+elementos ficticios. Comprueba encabezados, referencias, truncamiento,
+coordenadas no finitas, vértices repetidos, tetraedros duplicados y volumen nulo;
+acepta comentarios, atributos y marcadores declarados.
 
 Para el objetivo específico 2, los índices y las incidencias fijas ofrecen una
 base para separar topología inmutable y asignaciones. Sin embargo, los vectores
-por poliedro, el conjunto ordenado, la recursión y las escrituras secuenciales en
+por poliedro, el conjunto ordenado, la pila de recorrido y las escrituras secuenciales en
 `owners` requieren adaptación. No constituyen una implementación masivamente
 paralela. Las representaciones alternativas se revisan en @sec:ea-estructuras.
 
-#pendiente[Estructura de datos: validar numeración, referencias y multiplicidad
-  de incidencias durante la lectura. Para el objetivo paralelo, especificar una
-  representación aplanada de las listas de cada poliedro con desplazamientos y
-  tamaños; comparar memoria total, copias y accesos con la representación actual,
-  incluyendo la subdivisión tetraédrica retenida. Registrar el costo de construir
-  esa representación, no solo el de recorrerla.]
+El contrato experimental de pertenencia y el verificador común comprueban
+cobertura, exclusividad, conectividad por caras y multiplicidad de la frontera.
+E6 de @sec:ex-tablas construye contenedores aplanados y compara capacidades
+reservadas por componente. El inventario distingue entrada, copia común de
+salida y auxiliares retenidos; no identifica esos bytes con el RSS del proceso.
 
 = Arquitectura y flujo de datos <sec:ac-arquitectura>
 
@@ -348,11 +358,11 @@ generación de estadísticas y produce archivos OFF por poliedro y `details.csv`
 El logger declara el nivel `INFO` y escribe en la salida estándar con ese
 prefijo; no configura archivos de trazas ni mide memoria.
 
-#pendiente[Reproducibilidad del software: fijar revisiones de las dependencias
-  QuickHull y polyhedron-kernel, actualmente referidas a ramas en CMake, y eliminar
-  la inclusión de ImGui desde una ruta de compilación en `stat.cpp`. Documentar
-  una configuración reproducible antes de asociar mediciones a esta versión.
-  La compilación y ejecución del programa quedan a cargo del autor.]
+QuickHull y polyhedron-kernel se fijaron por commit en CMake. El manifiesto de
+campaña conserva también las revisiones efectivas de Eigen, GoogleTest y
+CinoLib, las huellas de los binarios y una copia de las fuentes. La inclusión
+local de ImGui desde `stat.cpp` fue eliminada. Se verificaron construcciones
+Release de biblioteca, CLI, pruebas y visor.
 
 = Métricas implementadas y su interpretación <sec:ac-metricas>
 
@@ -368,9 +378,10 @@ El área de una cara triangular se calcula como la mitad de la norma del product
 cruzado de dos de sus lados. `Polyhedron::area` suma esas áreas sobre las caras
 de frontera. Para el volumen, `Tetrahedron::volume` divide por seis el producto
 mixto de tres aristas desde un mismo vértice; `Polyhedron::volume` suma esos
-valores sobre los tetraedros constituyentes. No aplica valor absoluto por
-tetraedro ni al total. La orientación de la entrada condiciona, por tanto, el
-signo y las posibles cancelaciones de esta magnitud.
+valores absolutos sobre los tetraedros constituyentes. Así se evita que una
+mezcla de orientaciones cancele volumen en una partición. Las coordenadas y
+acumulaciones usan doble precisión. El signo del volumen de un tetraedro sigue
+disponible en `Tetrahedron::volume` como información de orientación.
 
 `Hull` entrega a QuickHull las coordenadas referenciadas por `poly.vertices` y
 construye caras triangulares a partir de los índices devueltos. Sus métodos de
@@ -410,16 +421,15 @@ volumen del poliedro.
 
 Esta convención mezcla ausencia de kernel con un valor numérico especial en el
 mismo campo. Además, las divisiones no comprueban explícitamente volumen de
-kernel, área de envolvente o longitud máxima nulos. El cálculo de volumen
-superficial accede al primer vértice, por lo que requiere una colección no
-vacía. Estas condiciones delimitan cómo deben interpretarse estadísticas de
+kernel, área de envolvente o longitud máxima nulos. El cálculo de volumen superficial devuelve cero ante una colección vacía. Estas condiciones delimitan cómo deben interpretarse estadísticas de
 entradas degeneradas o resultados incompletos.
 
-#pendiente[Métricas: justificar las tres razones respecto de los requisitos del
-  método numérico que se utilizará. Separar «sin kernel» de cero numérico, definir
-  el manejo de denominadores nulos y verificar orientación y volumen con casos
-  analíticos. Si se incorpora una medida de convexidad volumétrica, definirla y
-  probarla como una métrica nueva, sin renombrar silenciosamente `volumeRatio`.]
+La campaña no usa el cero sustituto ni el registro opcional como criterio de
+clasificación. El evaluador común de @sec:ex-metricas separa los cuatro estados
+de kernel, exporta la fracción kernel/celda y conserva las razones indefinidas
+como tales. Se validó con geometrías analíticas y mallas publicadas; el visor
+mantiene las convenciones históricas de `PolyStat`. Actualizar esa interfaz no
+se confunde con verificar las métricas experimentales.
 
 == Agregación y archivos de salida
 
@@ -436,18 +446,18 @@ tetraedros asignados, esta medida no cuenta exclusivamente los vértices de la
 superficie poliédrica. Tampoco es la razón de reducción de tetraedros a
 poliedros. Los conteos de ambas clases de celdas se exportan por separado.
 
-La función `createStats` presenta inconsistencias visibles en la serialización:
-faltan separadores después de algunos promedios y se vuelven a escribir los
-extremos de superficie donde el encabezado anuncia extremos de arista. En
-cambio, la salida detallada enumera por celda las tres razones, presencia de
-kernel y áreas y volúmenes de poliedro, envolvente y kernel. La existencia de
-esa ruta no valida automáticamente todos sus valores.
+Se corrigieron en `createStats` los separadores y la exportación de los
+extremos de arista; también se retiró el campo vacío final del CSV detallado.
+Una prueba de integración contrasta encabezados, cantidad de campos y valores
+conocidos del cubo. La salida histórica conserva sus definiciones de razones y
+su registro opcional de kernel. La campaña usa otro exportador común de
+pertenencia y métricas, descrito en @sec:ex-metricas, que separa los cuatro
+estados de kernel y los valores indefinidos.
 
-#pendiente[Exportación: corregir y probar la correspondencia entre columnas y
-  valores de `createStats`, incluidos separadores y extremos de arista. Definir
-  por separado reducción de celdas y uso de vértices de frontera. Antes del
-  capítulo experimental, contrastar cada fila con el registro detallado y
-  registrar por separado el tiempo de estadísticas y exportaciones auxiliares.]
+Las estadísticas geométricas se cronometran externamente en el evaluador,
+separadas del núcleo C++. La escritura medida en la campaña corresponde al
+archivo de pertenencia; no se compara directamente con una exportación VISF o
+con los OFF auxiliares de la CLI histórica.
 
 = Visualización y trabajo de integración <sec:ac-visualizacion>
 

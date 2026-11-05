@@ -12,42 +12,38 @@
 #show: conf.with(metadata: metadata)
 
 #resumen(metadata: metadata)[
-  Esta tesis estudia la generación indirecta de mallas poliédricas mediante la
-  agrupación de tetraedros de una malla de entrada. Se propone una estrategia
-  basada en cavidades definidas operacionalmente a partir de la circunsfera de
-  un tetraedro semilla. El objetivo es investigar si esta forma de agrupación
-  permite obtener celdas de calidad y un procedimiento eficiente, en comparación
-  con otras variantes de la familia Polylla. La eficiencia, la robustez y la
-  adecuación para métodos numéricos se plantean como hipótesis por contrastar.
+  Esta tesis estudia la generación indirecta de mallas poliédricas mediante
+  agrupación de tetraedros. Propone una construcción secuencial por cavidades:
+  ordena semillas por radio de circunsfera creciente y agrupa vecinos por cara
+  según la posición de sus circuncentros respecto de la esfera semilla.
+  Conserva la subdivisión tetraédrica y reconstruye las fronteras desde la
+  pertenencia final, con desempate determinista y geometría en doble precisión.
 
-  Se revisan fundamentos geométricos, calidad, estructuras de datos y
-  paralelización. La implementación secuencial ordena candidatos por radio
-  creciente y recorre vecinos por cara; su aceptación compara circuncentros con
-  la esfera de la semilla. Se documentan propietarios y fronteras, conservando
-  la subdivisión tetraédrica junto con las agrupaciones.
+  La evaluación usa un contrato común de pertenencia para Cavidades, dos
+  criterios Face con y sin reparación, Edge de referencia y una agregación de
+  pares. Comprende 60 mallas sintéticas distintas, 60 modelos reales
+  estratificados y una referencia suplementaria. Se procesan 919 combinaciones
+  de malla y variante, incluidos los órdenes alternativos de semillas. Los
+  fallos y las métricas indeterminadas se conservan explícitamente; un
+  certificado dual audita las ausencias de kernel y la orientación exacta
+  resuelve tetraedros delgados sin alterar los resultados primarios.
 
-  El análisis diferencia el comportamiento activo de las capacidades aún
-  incompletas. La reparación provisional no interviene en el operador principal,
-  y la integración de Face y Edge en una interfaz común permanece pendiente.
-  Se examinan además el cálculo de kernel y las razones geométricas disponibles,
-  explicitando las condiciones de interpretación y las validaciones necesarias
-  antes de usar sus exportaciones como evidencia experimental.
+  Cavidades completa las 60 entradas sintéticas principales y 58 de las 60
+  reales estratificadas. En estas últimas, la reducción mediana es 76.54 % y las
+  medianas de las cotas numéricas de fracción de kernel son 99.52–99.93 %.
+  Frente a Face sin reparación se observan ventajas de kernel junto con menor
+  reducción en varias familias. La hipótesis de una mejora conservadora de
+  cinco puntos porcentuales en tres familias y en datos reales no queda
+  respaldada. Cambiar a radio decreciente aumenta la reducción y reduce el
+  kernel confirmado en las familias aleatorias estudiadas.
 
-  Se establece un diseño experimental que relaciona las preguntas de
-  investigación con métricas de partición, reducción de celdas, kernel, tiempo
-  y memoria. El protocolo contempla entradas locales inventariadas, familias
-  controladas por generar y comparadores sujetos a integración.
-
-  #pendiente[Resultados del resumen: ejecutar el protocolo del capítulo 5 una
-    vez validados entradas, métricas y comparadores; reemplazar este bloque por
-    una frase con reducción, fracción de kernel, tiempo y memoria, indicando
-    entradas y alcance de comparación. Si la hipótesis no se confirma,
-    describir los límites observados sin atribuir mejoras inexistentes.]
-
-  Se propone además paralelizar cálculos locales, resolver conflictos de
-  propiedad y construir una salida aplanada. Su corrección y desempeño requieren
-  desarrollo posterior.
-
+  En 700 mediciones nativas, ambas familias completan cuatro millones de
+  vértices objetivo. A ocho millones, Random agota el presupuesto de memoria y
+  Quality supera el tiempo de generación. Cavidades es más rápido que Face
+  sin reparación en tamaños altos de Quality, mientras Face es más rápido en
+  Random a gran escala. La salida aplanada reduce 30.9–51.3 % la capacidad de
+  las listas por celda en los cuatro casos medidos. La validación de VEM y del
+  diseño paralelo queda como trabajo futuro.
 ]
 
 // #dedicatoria[
@@ -266,7 +262,7 @@
   #include "capitulos/algoritmo-cavidades.typ"
 ]
 
-#capitulo(title: "Diseño experimental")[
+#capitulo(title: "Diseño experimental y resultados")[
   #set heading(offset: 1)
   #include "capitulos/experimentos.typ"
 ]
